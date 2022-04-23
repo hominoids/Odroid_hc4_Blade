@@ -6,7 +6,7 @@
 function poly_sides_r(r) = (max(round(4 * r),3)+1);
 
 // 2d primitive for outside fillets.
-module fillet_2d_o(fillet_r, fillet_angle=90, fillet_fn=0) {
+module fillet_2d_o(fillet_r, fillet_angle=90, fillet_fn=90) {
   add=0.01;
   f_fn=(fillet_fn>0) ? fillet_fn*4 : (ceil(poly_sides_r(fillet_r)/4)*4);
   if (fillet_r>0) {
@@ -23,7 +23,7 @@ module fillet_2d_o(fillet_r, fillet_angle=90, fillet_fn=0) {
 }
 
 // 2d primitive for inside fillets.
-module fillet_2d_i(fillet_r, fillet_angle=90, fillet_fn=0) {
+module fillet_2d_i(fillet_r, fillet_angle=90, fillet_fn=90) {
   add=0.01;
   f_fn=(fillet_fn>0) ? fillet_fn*4 : (ceil(poly_sides_r(fillet_r)/4)*4);
   if (fillet_r>0) {
@@ -41,7 +41,7 @@ module fillet_2d_i(fillet_r, fillet_angle=90, fillet_fn=0) {
 }
 
 // 3d rotated outside fillet.
-module fillet_polar_o(inner_r, fillet_r, fillet_angle=90, fillet_fn=0, rotate_fn=0) {
+module fillet_polar_o(inner_r, fillet_r, fillet_angle=90, fillet_fn=90, rotate_fn=0) {
   if (fillet_r>0) {
   rotate_extrude(convexity=8, $fn=rotate_fn) {
     translate([inner_r, 0, 0]) {
@@ -52,7 +52,7 @@ module fillet_polar_o(inner_r, fillet_r, fillet_angle=90, fillet_fn=0, rotate_fn
 }
 
 // 3d rotated inside fillet.
-module fillet_polar_i(inner_r, fillet_r, fillet_angle=90, fillet_fn=0, rotate_fn=0) {
+module fillet_polar_i(inner_r, fillet_r, fillet_angle=90, fillet_fn=90, rotate_fn=0) {
     if (fillet_r>0) {
         rotate_extrude(convexity=8, $fn=rotate_fn) {
           translate([inner_r, 0, 0]) {
@@ -62,7 +62,7 @@ module fillet_polar_i(inner_r, fillet_r, fillet_angle=90, fillet_fn=0, rotate_fn
 }
 
 // 3d rotated inside fillet negative.
-module fillet_polar_i_n(outer_r, fillet_r, fillet_angle=90, fillet_fn=0, rotate_fn=0) {
+module fillet_polar_i_n(outer_r, fillet_r, fillet_angle=90, fillet_fn=90, rotate_fn=0) {
     if (fillet_r>0) {
         rotate_extrude(convexity=8, $fn=rotate_fn) {
           translate([outer_r, 0, 0]) {
@@ -72,7 +72,7 @@ module fillet_polar_i_n(outer_r, fillet_r, fillet_angle=90, fillet_fn=0, rotate_
 }
 
 // 3d linear outside fillet.
-module fillet_linear_o(l, fillet_r, fillet_angle=90, fillet_fn=0, add=0.02) {
+module fillet_linear_o(l, fillet_r, fillet_angle=90, fillet_fn=90, add=0.02) {
   if (fillet_r>0) {
 translate([0,0,-add/2])
     linear_extrude(height=l+add, center=false) {
@@ -82,7 +82,7 @@ translate([0,0,-add/2])
 }
 
 // 3d linear inside fillet.
-module fillet_linear_i(l, fillet_r, fillet_angle=90, fillet_fn=0, add=0.02) {
+module fillet_linear_i(l, fillet_r, fillet_angle=90, fillet_fn=90, add=0.02) {
   if (fillet_r>0) {
     translate([0,0,-add/2])
     linear_extrude(height=l+add, center=false) {
@@ -91,7 +91,7 @@ module fillet_linear_i(l, fillet_r, fillet_angle=90, fillet_fn=0, add=0.02) {
   }
 }
 
-module cube_negative_fillet(size, radius=-1, vertical=[3,3,3,3], top=[0,0,0,0], bottom=[0,0,0,0], $fn=90, vertical_fn=[90,90,90,90], top_fn=[90,90,90,90], bottom_fn=[90,90,90,90]){
+module cube_negative_fillet(size, radius=-1, vertical=[3,3,3,3], top=[0,0,0,0], bottom=[0,0,0,0], $fn=90, vertical_fn=[0,0,0,0], top_fn=[0,0,0,0], bottom_fn=[0,0,0,0]){
 
 vertical_fn= ($fn>0) ? [$fn,$fn,$fn,$fn] : vertical_fn;
 top_fn= ($fn>0) ? [$fn,$fn,$fn,$fn] : top_fn;
@@ -128,7 +128,7 @@ module cube_positive_fillet(size, radius=-1, vertical=[0,0,0,0], top=[0,0,0,0], 
     }
 }
 
-module cube_positive_fillet_corners(size, radius=-1, vertical=[0,0,0,0], top=[0,0,0,0], bottom=[0,0,0,0], vertical_angle=[90,90,90,90], top_angle=[90,90,90,90], bottom_angle=[90,90,90,90], vertical_flip=[0,0,0,0], top_flip=[0,0,0,0], bottom_flip=[0,0,0,0], $fn=0){
+module cube_positive_fillet_corners(size, radius=-1, vertical=[0,0,0,0], top=[0,0,0,0], bottom=[0,0,0,0], vertical_angle=[90,90,90,90], top_angle=[90,90,90,90], bottom_angle=[90,90,90,90], vertical_flip=[0,0,0,0], top_flip=[0,0,0,0], bottom_flip=[0,0,0,0], $fn=90){
 
     j=[1,0,1,0];
 
@@ -156,7 +156,7 @@ render(convexity=4) intersection() {
     }
 }
 
-module cube_fillet_inside(size, radius=-1, vertical=[0,0,0,0], top=[0,0,0,0], bottom=[0,0,0,0], $fn=90, vertical_fn=[90,90,90,90], top_fn=[90,90,90,90], bottom_fn=[90,90,90,90]){
+module cube_fillet_inside(size, radius=-1, vertical=[0,0,0,0], top=[0,0,0,0], bottom=[0,0,0,0], $fn=90, vertical_fn=[0,0,0,0], top_fn=[0,0,0,0], bottom_fn=[0,0,0,0]){
     //makes CENTERED cube with round corners
     // if you give it radius, it will fillet vertical corners.
     //othervise use vertical, top, bottom arrays
@@ -173,7 +173,7 @@ module cube_fillet_inside(size, radius=-1, vertical=[0,0,0,0], top=[0,0,0,0], bo
     }
 }
 
-module cylinder_fillet_inside(h=10, r=10, top=3, bottom=3, $fn=0, fillet_fn=0, center=false) {
+module cylinder_fillet_inside(h=10, r=10, top=3, bottom=3, $fn=0, fillet_fn=90, center=false) {
     c_fn=($fn>0) ? $fn : poly_sides_r(r);
     rotfix=(($fn>0) ? 0 : 180/c_fn);
     cent=(center) ? -h/2 : 0;
@@ -191,7 +191,7 @@ module cylinder_fillet_inside(h=10, r=10, top=3, bottom=3, $fn=0, fillet_fn=0, c
         }
     }
 
-module cylinder_fillet_outside(h=10, r=10, top=3, bottom=3, $fn=0, fillet_fn=0, center=false) {
+module cylinder_fillet_outside(h=10, r=10, top=3, bottom=3, $fn=0, fillet_fn=90, center=false) {
     c_fn=($fn>0) ? $fn : poly_sides_r(r);
     rotfix=(($fn>0) ? 0 : 180/c_fn);
     cent=(center) ? -h/2 : 0;

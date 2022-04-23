@@ -7,7 +7,7 @@ Standalone and cluster case design for the Hard Kernel Odroid-hc4
 
 License: GPLv3.
 
-![Image](hc4-blade.gif)
+![Image](hc4_blade.gif)
 
 ### Notes
 

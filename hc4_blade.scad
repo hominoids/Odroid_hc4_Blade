@@ -15,12 +15,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
     Code released under GPLv3: http://www.gnu.org/licenses/gpl.html
 
-    20210320 Version 1.0.0  Odroid-HC4 Blade
+    20210320 Version 1.0    Odroid-HC4 Blade
+    20210423 Version 1.1    fixed fan mount hole spacing, changed to sbc_case_builder_library.scad
 
 */
 
-use <../sbc_models/sbc_models.scad>;
-use <./lib/sbccfw_library.scad>;
+use <./lib/sbc_models.scad>;
+use <./lib/sbc_case_builder_library.scad>;
 use <./lib/fillets.scad>;
 
 /* user configurable options */
@@ -53,20 +54,31 @@ hd25_xloc1 = 4;                         // blade 2.5" hd x axis location
 hd25_yloc1 = 80;                        // blade 2.5" hd y axis location
 hd25_xloc2 = 4;                         // rear 2.5" hd x axis location
 hd25_yloc2 = depth-114;                 // rear 2.5" hd y axis location
-bottom_standoff = [7.5,                 // radius
-                   bottom_height-pcb_z, // height
-                   3.6,                 // holesize
-                  10,                   // supportsize
-                   4,                   // supportheight
-                   1];                  // 0=none, 1=countersink, 2=recessed hole, 3=nut holder, 4=blind hole
-top_standoff =    [6.75,                // radius
-                   top_height,          // height
+
+top_standoff =    [6.75,                // diameter
+                   top_height,          // height top_height
                    2.75,                // holesize
-                  10,                   // supportsize
+                   10,                  // supportsize
                    4,                   // supportheight
-                   4];                  // 0=none, 1=countersink, 2=recessed hole, 3=nut holder, 4=blind hole
-tso_style = 1;                          // top standoff style 0=hex, 1=cylinder
-bso_style = 1;                          // bottom standoff style 0=hex, 1=cylinder
+                   4,                   // 0=none, 1=countersink, 2=recessed hole, 3=nut holder, 4=blind hole
+                   1,                   // standoff style 0=hex, 1=cylinder
+                   0,                   // enable reverse standoff
+                   0,                   // enable insert at top of standoff
+                   0,                   // insert hole dia. mm
+                   0];                  // insert depth mm
+
+bottom_standoff = [7.5,                 // diameter
+                   bottom_height-pcb_z, // height  bottom_height-pcb_z
+                   3.6,                 // holesize
+                   10,                  // supportsize
+                   4,                   // supportheight
+                   1,                   // 0=none, 1=countersink, 2=recessed hole, 3=nut holder, 4=blind hole
+                   1,                   // standoff style 0=hex, 1=cylinder
+                   0,                   // enable reverse standoff
+                   0,                   // enable insert at top of standoff
+                   0,                   // insert hole dia. mm
+                   0];                  // insert depth mm
+                   
 connect = [12,14,36.5];                 // interconnection height integrated=36.5
 i_hole = 5.5;                           // interconnection hole size
 
@@ -170,8 +182,8 @@ if(mode == "explode") {
     bottom = [0,0,$t*-100];
     translate([-(top_height+bottom_height)/2,depth/2,wall_thick+gap+3]) rotate([180,270,0]) {
                 if(oled) {
-                    translate([30,depth+gap-(2*wall_thick)-4.25,floor_thick-.5]) 
-                        rotate([0,270,180]) hc4_oled();
+                    translate([30,depth+gap-(2*wall_thick)-4.25,floor_thick-.5+28.5]) 
+                        rotate([0,90,0]) hc4_oled();
                     }
                 if(model == "blade") {
                     translate([73,84+95,bottom_standoff[1]+8.6+13]) rotate([180,0,-90]) hd25(7);
@@ -206,7 +218,7 @@ module blade() {
             translate([73,84+95,bottom_standoff[1]+8.6+13]) rotate([180,0,-90]) hd25(7);
             }
         if(oled) {
-            translate([30,depth+gap-(2*wall_thick)-4.25,floor_thick-.5]) rotate([0,270,180]) hc4_oled();
+            translate([30,depth+gap-(2*wall_thick)-4.25,floor_thick-.5+28.5]) rotate([0,90,0]) hc4_oled();
             }
         }
     }
@@ -238,14 +250,14 @@ module hc4_blade_bottom(model) {
                     }
                 }
             // pcb standoffs
-            stud([4,5.5,0], bottom_standoff, bso_style);
-            stud([pcb_width-4,5.5,0], bottom_standoff, bso_style);
-            stud([4,58.5,0], bottom_standoff, bso_style);
-            stud([pcb_width-4,pcb_depth-5.5,0], bottom_standoff, bso_style);
+            translate([4,5.5,0]) standoff(bottom_standoff);
+            translate([pcb_width-4,5.5,0]) standoff(bottom_standoff);
+            translate([4,58.5,0]) standoff(bottom_standoff);
+            translate([pcb_width-4,pcb_depth-5.5,0]) standoff(bottom_standoff);
             if(drvdepth >= 13) {
                 // drive bay standoffs
-                stud([4,depth-(2*wall_thick)-5.5-(2*gap),0], bottom_standoff, bso_style);
-                stud([pcb_width-4,depth-(2*wall_thick)-5.5-(2*gap),0], bottom_standoff, bso_style);
+                translate([4,depth-(2*wall_thick)-5.5-(2*gap),0]) standoff(bottom_standoff);
+                translate([pcb_width-4,depth-(2*wall_thick)-5.5-(2*gap),0]) standoff(bottom_standoff);
                 }
             // oled mount points
             if(oled) {
@@ -261,8 +273,8 @@ module hc4_blade_bottom(model) {
                     cube([16,2,1]);   
                 }
             // heatsink fan hole support
-            translate([21+(43/2),35-3,floor_thick-adjust]) cylinder(d=6, h=2);
-            translate([21+(43/2),35+34+3,floor_thick-adjust]) cylinder(d=6, h=2);
+            translate([21+(43/2),35-5.5,floor_thick-adjust]) cylinder(d=7, h=2);
+            translate([21+(43/2),35+34+5.5,floor_thick-adjust]) cylinder(d=7, h=2);
             }
         // heatsink opening
         translate([21,35,-adjust]) cube([43,34,floor_thick+(2*adjust)]);
@@ -270,8 +282,8 @@ module hc4_blade_bottom(model) {
         translate([16.91,44.52,-adjust]) cylinder(d=6.5, h=bottom_standoff[1]);
         translate([68.09,64.53,-adjust]) cylinder(d=6.5, h=bottom_standoff[1]);
         // heatsink fan holes
-        translate([21+(43/2),35-3,-adjust]) cylinder(d=3, h=bottom_standoff[1]);
-        translate([21+(43/2),35+34+3,-adjust]) cylinder(d=3, h=bottom_standoff[1]);
+        translate([21+(43/2),35-5.5,-adjust]) cylinder(d=3, h=bottom_standoff[1]);
+        translate([21+(43/2),35+34+5.5,-adjust]) cylinder(d=3, h=bottom_standoff[1]);
         translate([9+(43/2),69,-adjust]) cylinder(d=5, h=bottom_standoff[1]);
         // button hole
         translate([37.65,77.85,-adjust]) cylinder(d=5, h=floor_thick+(2*adjust));
@@ -353,14 +365,14 @@ module hc4_blade_top(model) {
                     }
                 }
             // pcb standoffs
-            stud([4,-5.5,0], top_standoff, tso_style);
-            stud([pcb_width-4,-5.5,0], top_standoff, tso_style);
-            stud([4,-58.5,0], top_standoff, tso_style);
-            stud([pcb_width-4,-pcb_depth+5.5,0], top_standoff, tso_style);
+            translate([4,-5.5,0]) standoff(top_standoff);
+            translate([pcb_width-4,-5.5,0]) standoff(top_standoff);
+            translate([4,-58.5,0]) standoff(top_standoff);
+            translate([pcb_width-4,-pcb_depth+5.5,0]) standoff(top_standoff);
             // drive bay standoffs
             if(drvdepth >= 13) {
-                stud([4,-depth+(2*wall_thick)+5.5+(2*gap),0], top_standoff, tso_style);
-                stud([pcb_width-4,-depth+(2*wall_thick)+5.5+(2*gap),0], top_standoff, tso_style);
+                translate([4,-depth+(2*wall_thick)+5.5+(2*gap),0]) standoff(top_standoff);
+                translate([pcb_width-4,-depth+(2*wall_thick)+5.5+(2*gap),0]) standoff(top_standoff);
                 }
             // drive mount for sata up(left) adapter
             if(sata_up_adapter) {
